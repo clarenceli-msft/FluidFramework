@@ -88,20 +88,25 @@ jobs:
             TestCoverage=$(testCoverage)
           "
 
-    - template: include-use-node-version.yml
+    # - template: include-use-node-version.yml
 
-    - ${{ if eq(parameters.packageManager, 'pnpm') }}:
-          - template: include-install-pnpm.yml
-            parameters:
-              buildDirectory: ${{ parameters.buildDirectory }}
+    # - ${{ if eq(parameters.packageManager, 'pnpm') }}:
+    #     - template: include-install-pnpm.yml
+    #         parameters:
+    #           buildDirectory: ${{ parameters.buildDirectory }}
 
-    - task: Bash@3
-      displayName: Install dependencies
-      inputs:
-        targetType: 'inline'
+    # - task: Bash@3
+    #   displayName: Install dependencies
+    #   inputs:
+    #     targetType: 'inline'
+    #     workingDirectory: ${{ parameters.buildDirectory }}
+    #     script: |
+    #       ${{ parameters.packageManagerInstallCommand }}
+    - template: include-install.yml 
+      parameters:
+        packageManager: ${{ parameters.packageManager }}
         workingDirectory: ${{ parameters.buildDirectory }}
-        script: |
-          ${{ parameters.packageManagerInstallCommand }}
+        packageManagerInstallCommand: ${{ parameters.packageManagerInstallCommand }}
 
     # Build
     - ${{ if ne(parameters.taskBuild, 'false') }}:
