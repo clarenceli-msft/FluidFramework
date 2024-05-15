@@ -1,0 +1,82 @@
+# Copyright (c) Microsoft Corporation and contributors. All rights reserved.
+# Licensed under the MIT License.
+
+# detect-flaky-tests pipeline
+
+name: $(Build.BuildId)
+
+parameters:
+- name: releaseBuildOverride
+  displayName: Release Build (default = not released)
+  type: string
+  default: none
+  values:
+    - none
+    - prerelease
+    - release
+- name: publishOverride
+  displayName: Publish Override (default = based on branch)
+  type: string
+  default: default
+  values:
+    - default
+    - skip
+    - force
+- name: buildToolsVersionToInstall
+  displayName: Fluid build tools version (default = installs version in repo)
+  type: string
+  default: repo
+- name: nonScopedPackages
+  displayName: Non-scoped packages to publish
+  type: object
+  default:
+  - fluid-framework
+
+schedules:
+  - cron: "0 0 * * *"
+    displayName: Daily midnight build
+    branches:
+      include:
+      - main
+      - next
+      - lts
+      - release/*
+
+jobs:
+  - job: JobA
+    steps:
+    - template: templates/build-npm-package.yml
+      parameters: {parameters}
+
+
+  - job: JobB
+    steps:
+    - template: templates/build-npm-package.yml
+      parameters: {parameters}
+
+  - job: JobC
+    steps:
+    - template: templates/build-npm-package.yml
+      parameters: {parameters}
+
+  - job: JobD
+    steps:
+    - template: templates/build-npm-package.yml
+      parameters: {parameters}
+
+  - job: JobE
+    steps:
+    - template: templates/build-npm-package.yml
+      parameters: {parameters}
+
+  - job: Final
+    dependsOn:
+    - jobA
+    - jobB
+    - jobC
+    - jobD
+    - jobE
+    steps:
+    - script: echo Hello from final job
+
+
